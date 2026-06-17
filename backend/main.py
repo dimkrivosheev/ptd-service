@@ -17,6 +17,7 @@ class PTDRequest(BaseModel):
     brand_model: str = ""
     vehicle_type: str = ""
     vehicle_direction: str = ""
+    vehicle_direction: str = ""
     reg_number: str = ""
     vin: str = ""
     cc: str = ""; body_num: str = ""; chassis_num: str = "ОТСУТСТВУЕТ"
