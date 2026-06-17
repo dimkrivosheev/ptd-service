@@ -170,13 +170,13 @@ def page2(c, D):
     # Раздел 5
     has_v='vehicle' in selected
     vt=D.get('vehicle_type','auto')
+    vdr=D.get('vehicle_direction','')
     t(c,'5. Сведения о транспортных средствах:',M,y,8,NB); y-=7
-    dr=D.get('direction','')
-    checkbox(c,M,y,checked=has_v and dr=='import'); t(c,'Ввоз (свободное обращение)',M+4.5,y,7)
-    checkbox(c,M+52,y,checked=has_v and dr=='import' and vt in ('auto','trailer')); t(c,'Временный ввоз',M+56.5,y,7)
-    checkbox(c,M+90,y,checked=has_v and dr=='export'); t(c,'Вывоз',M+94.5,y,7)
-    checkbox(c,M+112,y,checked=has_v and dr=='temp_export'); t(c,'Временный вывоз',M+116.5,y,7)
-    checkbox(c,M+152,y,checked=has_v and dr=='transit'); t(c,'Транзит',M+156.5,y,7)
+    checkbox(c,M,y,checked=(vdr=='import')); t(c,'Ввоз (свободное обращение)',M+4.5,y,7)
+    checkbox(c,M+52,y,checked=(vdr=='temp_import')); t(c,'Временный ввоз',M+56.5,y,7)
+    checkbox(c,M+90,y,checked=(vdr=='export')); t(c,'Вывоз',M+94.5,y,7)
+    checkbox(c,M+112,y,checked=(vdr=='temp_export')); t(c,'Временный вывоз',M+116.5,y,7)
+    checkbox(c,M+152,y,checked=(vdr=='transit')); t(c,'Транзит',M+156.5,y,7)
     y-=8
     checkbox(c,M,y,checked=False); t(c,'Транспортные средства, ввозимые с освобождением от уплаты таможенных пошлин, налогов (ввоз со льготой)',M+4.5,y,6.5)
     y-=10

@@ -1,32 +1,58 @@
-import { useState } from "react";
-import { Card, Field, Input, Select, Row, RadioGroup, NavButtons } from "../FormFields";
+import { Card, Field, Input, Select, Row, NavButtons } from "../FormFields";
+
+const DIRECTION_OPTS = [
+  { key: "import",      label: "Ввоз (свободное обращение)" },
+  { key: "temp_import", label: "Временный ввоз" },
+  { key: "export",      label: "Вывоз" },
+  { key: "temp_export", label: "Временный вывоз" },
+  { key: "transit",     label: "Транзит" },
+];
+
+function RadioRow({ label, checked, onChange }) {
+  return (
+    <div className={`check-option ${checked ? "active" : ""}`} onClick={onChange}>
+      <span className="check-box" style={{ borderRadius: "50%" }}>{checked ? "✓" : ""}</span>
+      <span>{label}</span>
+    </div>
+  );
+}
 
 function fmtDate(val, mode) {
   const digits = val.replace(/\D/g, "");
-  if (mode === "my") {
-    return (digits.length <= 2 ? digits : digits.slice(0, 2) + "." + digits.slice(2, 6)).slice(0, 7);
-  }
-  return (digits.length <= 2 ? digits : digits.length <= 4 ? digits.slice(0,2)+"."+digits.slice(2) : digits.slice(0,2)+"."+digits.slice(2,4)+"."+digits.slice(4,8)).slice(0, 10);
+  if (mode === "my") return (digits.length <= 2 ? digits : digits.slice(0,2)+"."+digits.slice(2,6)).slice(0,7);
+  return (digits.length <= 2 ? digits : digits.length <= 4 ? digits.slice(0,2)+"."+digits.slice(2) : digits.slice(0,2)+"."+digits.slice(2,4)+"."+digits.slice(4,8)).slice(0,10);
 }
 
 export default function StepVehicle({ data, update, onNext, onPrev }) {
   const d = data;
   const vtype = d.vehicle_type || "auto";
+  const vdir = d.vehicle_direction || "";
   const eng = d.eng || "petrol";
   const dateMode = d.date_mode || "my";
 
   return (
     <>
-      <Card title="Транспортное средство" subtitle="Раздел 5">
-        <Field label="Вид транспортного средства">
-          <RadioGroup name="vtype" value={vtype} onChange={(v) => update({ vehicle_type: v })}
-            options={[
-              { value: "auto", label: "Авто / мото" },
-              { value: "trailer", label: "Прицеп" },
-              { value: "water", label: "Водное судно" },
-              { value: "air", label: "Воздушное судно" },
-            ]} />
-        </Field>
+      <Card title="Направление для транспортного средства" subtitle="Раздел 5 — цель ввоза/вывоза ТС">
+        <div className="checkbox-grid">
+          {DIRECTION_OPTS.map(o => (
+            <RadioRow key={o.key} label={o.label} checked={vdir === o.key}
+              onChange={() => update({ vehicle_direction: vdir === o.key ? "" : o.key })} />
+          ))}
+        </div>
+      </Card>
+
+      <Card title="Вид транспортного средства" subtitle="Раздел 5">
+        <div className="checkbox-grid" style={{ marginBottom: 16 }}>
+          {[
+            { key: "auto",    label: "Авто- и мототранспортное средство" },
+            { key: "trailer", label: "Прицеп к авто/мото" },
+            { key: "water",   label: "Водное судно" },
+            { key: "air",     label: "Воздушное судно" },
+          ].map(o => (
+            <RadioRow key={o.key} label={o.label} checked={vtype === o.key}
+              onChange={() => update({ vehicle_type: o.key })} />
+          ))}
+        </div>
 
         {(vtype === "auto" || vtype === "trailer") && <>
           <Row cols={2}>
@@ -46,27 +72,28 @@ export default function StepVehicle({ data, update, onNext, onPrev }) {
               <Field label="Номер шасси"><Input placeholder="ОТСУТСТВУЕТ" value={d.chassis_num || ""} onChange={(e) => update({ chassis_num: e.target.value })} /></Field>
             </Row>
             <Field label="Тип двигателя">
-              <RadioGroup name="eng" value={eng} onChange={(v) => update({ eng: v })}
-                options={[
-                  { value: "petrol", label: "Бензин / дизель" },
-                  { value: "electric", label: "Электро" },
-                  { value: "hybrid", label: "Гибрид" },
-                ]} />
+              <div className="checkbox-grid" style={{ marginBottom: 8 }}>
+                {[{ key:"petrol",label:"Бензин / дизель"},{key:"electric",label:"Электро"},{key:"hybrid",label:"Гибрид"}].map(o => (
+                  <RadioRow key={o.key} label={o.label} checked={eng === o.key} onChange={() => update({ eng: o.key })} />
+                ))}
+              </div>
             </Field>
             <Field label={eng === "electric" ? "Мощность, кВт" : "Объём двигателя, см³"}>
               <Input type="number" placeholder={eng === "electric" ? "150" : "2000"} value={d.cc || ""} onChange={(e) => update({ cc: e.target.value })} />
             </Field>
           </>}
           <Field label="Дата изготовления">
-            <RadioGroup name="date_mode" value={dateMode} onChange={(v) => update({ date_mode: v, manufacture_date: "" })}
-              options={[{ value: "my", label: "ММ.ГГГГ" }, { value: "full", label: "ДД.ММ.ГГГГ" }]} />
-            <div style={{ marginTop: 8 }}>
-              <Input placeholder={dateMode === "my" ? "ММ.ГГГГ" : "ДД.ММ.ГГГГ"} value={d.manufacture_date || ""} onChange={(e) => update({ manufacture_date: fmtDate(e.target.value, dateMode) })} />
+            <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+              {[{value:"my",label:"ММ.ГГГГ"},{value:"full",label:"ДД.ММ.ГГГГ"}].map(o => (
+                <RadioRow key={o.value} label={o.label} checked={dateMode === o.value} onChange={() => update({ date_mode: o.value, manufacture_date: "" })} />
+              ))}
             </div>
+            <Input placeholder={dateMode === "my" ? "ММ.ГГГГ" : "ДД.ММ.ГГГГ"} value={d.manufacture_date || ""}
+              onChange={(e) => update({ manufacture_date: fmtDate(e.target.value, dateMode) })} />
           </Field>
         </>}
 
-        {(vtype === "water") && <>
+        {vtype === "water" && <>
           <Field label="Вид судна"><Input placeholder="Яхта, катер, моторная лодка..." value={d.vessel_type || ""} onChange={(e) => update({ vessel_type: e.target.value })} /></Field>
           <Row cols={2}>
             <Field label="Регистрационный номер"><Input value={d.reg_num || ""} onChange={(e) => update({ reg_num: e.target.value })} /></Field>
@@ -78,8 +105,8 @@ export default function StepVehicle({ data, update, onNext, onPrev }) {
           </Row>
         </>}
 
-        {(vtype === "air") && <>
-          <Field label="Вид воздушного судна"><Input placeholder="Вертолёт, самолёт, дельтаплан..." value={d.aircraft_type || ""} onChange={(e) => update({ aircraft_type: e.target.value })} /></Field>
+        {vtype === "air" && <>
+          <Field label="Вид воздушного судна"><Input placeholder="Вертолёт, самолёт..." value={d.aircraft_type || ""} onChange={(e) => update({ aircraft_type: e.target.value })} /></Field>
           <Row cols={2}>
             <Field label="Регистрационный номер"><Input value={d.reg_num || ""} onChange={(e) => update({ reg_num: e.target.value })} /></Field>
             <Field label="Страна регистрации"><Input value={d.reg_country || ""} onChange={(e) => update({ reg_country: e.target.value })} /></Field>
@@ -90,19 +117,10 @@ export default function StepVehicle({ data, update, onNext, onPrev }) {
         </>}
 
         <Row cols={2}>
-          <Field label="Стоимость">
-            <Input type="number" placeholder="25000" value={d.vehicle_price || ""} onChange={(e) => update({ vehicle_price: e.target.value })} />
-          </Field>
+          <Field label="Стоимость"><Input type="number" placeholder="25000" value={d.vehicle_price || ""} onChange={(e) => update({ vehicle_price: e.target.value })} /></Field>
           <Field label="Валюта">
             <Select value={d.vehicle_currency || "USD"} onChange={(e) => update({ vehicle_currency: e.target.value })}>
-              <option value="USD">USD</option>
-              <option value="EUR">EUR</option>
-              <option value="RUB">RUB</option>
-              <option value="GBP">GBP</option>
-              <option value="JPY">JPY</option>
-              <option value="CNY">CNY</option>
-              <option value="AED">AED</option>
-              <option value="GEL">GEL</option>
+              {["USD","EUR","RUB","GBP","JPY","CNY","AED","GEL"].map(c => <option key={c}>{c}</option>)}
             </Select>
           </Field>
         </Row>
