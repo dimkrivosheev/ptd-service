@@ -16,7 +16,9 @@ class PTDRequest(BaseModel):
     selected_types: List[str] = []
     brand_model: str = ""
     vehicle_type: str = ""
-    vehicle_direction: str = ""; reg_number: str = ""; vin: str = ""
+    vehicle_direction: str = ""
+    reg_number: str = ""
+    vin: str = ""
     cc: str = ""; body_num: str = ""; chassis_num: str = "ОТСУТСТВУЕТ"
     manufacture_date: str = ""; price_str: str = ""
     cash: Optional[Any] = None; birth_date: str = ""
