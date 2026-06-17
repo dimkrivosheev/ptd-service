@@ -37,16 +37,24 @@ export default function App() {
 
   const selected = data.selected_types || [];
   const hasOther = selected.some(k => ["minerals","bio","other"].includes(k));
-  const dynamicSteps = TYPE_ORDER.filter(k => {
+
+  // ТС идёт сразу после декларанта, потом baggage только если есть товары
+  const hasVehicle = selected.includes("vehicle");
+  const hasGoods = selected.some(k => k !== "vehicle");
+  const vehicleSteps = hasVehicle ? ["vehicle"] : [];
+  const goodsSteps = TYPE_ORDER.filter(k => {
+    if (k === "vehicle") return false;
     if (k === "minerals") return hasOther;
     return selected.includes(k);
   });
-
-  // Если только ТС — пропускаем шаг baggage (разделы 2 и 3 не нужны)
-  const onlyVehicle = selected.length > 0 && selected.every(k => k === "vehicle");
-  const steps = onlyVehicle
-    ? ["select", "declarant", ...dynamicSteps, "review"]
-    : ["select", "declarant", "baggage", ...dynamicSteps, "review"];
+  const steps = [
+    "select",
+    "declarant",
+    ...vehicleSteps,
+    ...(hasGoods ? ["baggage"] : []),
+    ...goodsSteps,
+    "review",
+  ];
   const currentStep = steps[stepIndex];
 
   const next = () => setStepIndex(i => Math.min(i + 1, steps.length - 1));
@@ -55,8 +63,9 @@ export default function App() {
   const progressSteps = [
     { key: "select",    label: "Что везёте" },
     { key: "declarant", label: "Декларант" },
-    ...(onlyVehicle ? [] : [{ key: "baggage", label: "Перемещение" }]),
-    ...dynamicSteps.map(k => ({ key: k, label: TYPE_META[k]?.label || k })),
+    ...(hasVehicle ? [{ key: "vehicle", label: "Транспорт" }] : []),
+    ...(hasGoods ? [{ key: "baggage", label: "Перемещение" }] : []),
+    ...goodsSteps.map(k => ({ key: k, label: TYPE_META[k]?.label || k })),
     { key: "review",    label: "Проверка" },
   ];
 
@@ -65,7 +74,8 @@ export default function App() {
     if (currentStep === "declarant") return <StepDeclarant   data={data} update={update} onNext={next} onPrev={prev} />;
     if (currentStep === "baggage")   return <StepBaggage     data={data} update={update} onNext={next} onPrev={prev} />;
     if (currentStep === "review")    return <StepReview      data={data} selectedTypes={selected} onPrev={prev} onReset={() => { setData({}); setStepIndex(0); }} />;
-    if (currentStep === "minerals")  return <StepOther       data={data} update={update} onNext={next} onPrev={prev} />;
+    if (currentStep === "minerals")  return <StepOther data={data} update={update} onNext={next} onPrev={prev} />;
+    if (currentStep === "vehicle")   return <StepVehicle data={data} update={update} onNext={next} onPrev={prev} />;
     const Comp = TYPE_META[currentStep]?.component;
     if (!Comp) { next(); return null; }
     return <Comp data={data} update={update} onNext={next} onPrev={prev} />;
