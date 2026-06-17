@@ -136,15 +136,14 @@ export function RadioGroup({ name, options, value, onChange, toggleable = false 
   return (
     <div className="radio-group">
       {options.map((opt) => (
-        <label
+        <div
           key={opt.value}
           className={`radio-option ${value === opt.value ? "sel" : ""}`}
-          onClick={(e) => { e.preventDefault(); if (toggleable && value === opt.value) { onChange(""); } else { onChange(opt.value); } }}
+          onClick={() => { if (toggleable && value === opt.value) { onChange(""); } else { onChange(opt.value); } }}
         >
-          <input type="radio" name={name} value={opt.value} checked={value === opt.value} onChange={() => {}} />
           <span className="radio-dot" />
           <span className="radio-label">{opt.label}</span>
-        </label>
+        </div>
       ))}
     </div>
   );
