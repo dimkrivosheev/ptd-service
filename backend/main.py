@@ -24,6 +24,7 @@ class PTDRequest(BaseModel):
 @app.post("/generate_pdf")
 async def generate_pdf(req: PTDRequest):
     try:
+        import json; print('PAYLOAD:', json.dumps(req.dict(), ensure_ascii=False, indent=2)[:500])
         pdf_bytes = generate_ptd(req.dict())
         return StreamingResponse(io.BytesIO(pdf_bytes), media_type="application/pdf",
             headers={"Content-Disposition": "attachment; filename=PTD.pdf"})

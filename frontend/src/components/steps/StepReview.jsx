@@ -43,6 +43,7 @@ export default function StepReview({ data, selectedTypes, onPrev, onReset }) {
     // ТС
     vehicle_type: vt,
     vehicle_direction: d.vehicle_direction || "",
+    vehicle_direction: d.vehicle_direction || "",
     brand_model: [d.brand, d.model].filter(Boolean).join(", "),
     reg_number: [d.reg_num, d.reg_country].filter(Boolean).join(", "),
     vin: d.vin || "",
