@@ -47,7 +47,7 @@ export default function StepDeclarant({ data, update, onNext }) {
         </Field>
       </Card>
 
-      <Card title="Раздел 2 — Способ перемещения" subtitle="Как перемещаются товары и транспортное средство">
+      <Card title="Способ перемещения" subtitle="Как перемещаются товары и транспортное средство">
         <Field>
           <RadioGroup
             name="baggage_type"
@@ -62,7 +62,7 @@ export default function StepDeclarant({ data, update, onNext }) {
         </Field>
       </Card>
 
-      <Card title="Раздел 3 — Направление" subtitle="Цель перемещения товаров">
+      <Card title="Направление" subtitle="Цель перемещения товаров">
         <Field>
           <RadioGroup
             name="direction"
