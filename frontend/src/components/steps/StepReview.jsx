@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+const SOURCE_LABELS = { salary:"Зарплата / доходы от бизнеса", dividends:"Дивиденды", property:"Доходы от реализации имущества", transfers:"Безвозмездные трансферты", pension:"Пенсия / стипендия", rent:"Доходы от аренды", loan:"Заёмные средства", inheritance:"Наследство", other:"Прочее" };
+const PURPOSE_LABELS = { expenses:"Текущие расходы", investment:"Инвестиции", transfer_p:"Трансферты физлицам", transfer_l:"Благотворительность", other:"Прочее" };
 const TYPE_LABELS = { vehicle:"Транспортное средство", cash:"Наличные", goods:"Товары", cultural:"Культурные ценности", weapons:"Оружие", meds:"Лекарства", animals:"Животные/растения" };
 
 function Row({ label, value }) {
@@ -142,8 +144,8 @@ export default function StepReview({ data, selectedTypes, onPrev, onReset }) {
               {(d.cash.banknotes || []).map((b, i) => (
                 <Row key={i} label={`Банкноты ${i+1}`} value={b.amount ? `${b.amount} ${b.currency}` : null} />
               ))}
-              <Row label="Источник" value={(d.cash.sources || []).join(", ")} />
-              <Row label="Цель" value={(d.cash.purposes || []).join(", ")} />
+              <Row label="Источник" value={(d.cash.sources || []).map(k => SOURCE_LABELS[k] || k).join(", ")} />
+              <Row label="Цель" value={(d.cash.purposes || []).map(k => PURPOSE_LABELS[k] || k).join(", ")} />
             </Section>
           )}
 

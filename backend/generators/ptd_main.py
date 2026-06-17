@@ -11,14 +11,28 @@ import os
 W, H = A4
 
 def _reg_fonts():
-    for d in ['/usr/share/fonts/truetype/dejavu/','/usr/share/fonts/dejavu/']:
-        r,b = os.path.join(d,'DejaVuSans.ttf'), os.path.join(d,'DejaVuSans-Bold.ttf')
-        if os.path.exists(r):
-            pdfmetrics.registerFont(TTFont('R',r)); pdfmetrics.registerFont(TTFont('B',b)); return
-    for d in ['/usr/share/fonts/truetype/liberation/','/usr/share/fonts/liberation/']:
-        r,b = os.path.join(d,'LiberationSans-Regular.ttf'), os.path.join(d,'LiberationSans-Bold.ttf')
-        if os.path.exists(r):
-            pdfmetrics.registerFont(TTFont('R',r)); pdfmetrics.registerFont(TTFont('B',b)); return
+    candidates = [
+        # Linux — DejaVu
+        ('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',      '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'),
+        ('/usr/share/fonts/dejavu/DejaVuSans.ttf',               '/usr/share/fonts/dejavu/DejaVuSans-Bold.ttf'),
+        # Linux — Liberation
+        ('/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf', '/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf'),
+        ('/usr/share/fonts/liberation/LiberationSans-Regular.ttf',          '/usr/share/fonts/liberation/LiberationSans-Bold.ttf'),
+        # macOS — Arial
+        ('/Library/Fonts/Arial.ttf',                             '/Library/Fonts/Arial Bold.ttf'),
+        ('/System/Library/Fonts/Supplemental/Arial.ttf',         '/System/Library/Fonts/Supplemental/Arial Bold.ttf'),
+        # macOS — Helvetica Neue
+        ('/System/Library/Fonts/HelveticaNeue.ttc',              '/System/Library/Fonts/HelveticaNeue.ttc'),
+    ]
+    for r, b in candidates:
+        if os.path.exists(r) and os.path.exists(b):
+            pdfmetrics.registerFont(TTFont('R', r))
+            pdfmetrics.registerFont(TTFont('B', b))
+            return
+    # Последний вариант — встроенные шрифты ReportLab (без кириллицы, но не падает)
+    from reportlab.lib.fonts import addMapping
+    pdfmetrics.registerFont(TTFont('R', 'Helvetica'))
+    pdfmetrics.registerFont(TTFont('B', 'Helvetica-Bold'))
 try: _reg_fonts()
 except: pass
 NR,NB = 'R','B'
@@ -159,7 +173,7 @@ def page2(c,D):
     y-=10
     e,f,g,h=55,40,38,38
     fline(c,M,y,e,'(номер кузова)',D.get('body_num',''),bold=True)
-    fline(c,M+e+2,y,f,'(номер шасси)',D.get('chassis_num',''),bold=True)
+    v=D.get('chassis_num',''); fline(c,M+e+2,y,f,'(номер шасси)',v if v and v != 'ОТСУТСТВУЕТ' else '',bold=True)
     fline(c,M+e+f+4,y,g,'(дата изготовления)',D.get('manufacture_date',''),bold=True)
     fline(c,M+e+f+g+6,y,h,'(стоимость)',D.get('price_str',''),bold=True)
     y-=11
