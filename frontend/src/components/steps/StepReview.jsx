@@ -39,7 +39,8 @@ export default function StepReview({ data, selectedTypes, onPrev, onReset }) {
       address: d.address || "",
       country_from: d.country_from || "",
       country_to: d.country_to || "Россия",
-      direction: "import",
+      direction: d.direction || "import",
+      baggage_type: d.baggage_type || "accompanied",
       льгота: false,
       selected_types: selectedTypes,
       // ТС
