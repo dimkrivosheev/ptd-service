@@ -94,9 +94,6 @@ export default function StepVehicle({ data, update, onNext, onPrev }) {
           </Field>
         </Row>
 
-        <Field label="Дата подачи декларации">
-          <Input type="date" value={d.sign_date || ""} onChange={(e) => update({ sign_date: e.target.value })} />
-        </Field>
       </Card>
 
       <NavButtons onPrev={onPrev} onNext={onNext} />
