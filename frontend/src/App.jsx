@@ -42,8 +42,11 @@ export default function App() {
     return selected.includes(k);
   });
 
-  // Структура: select → declarant → baggage → [dynamic] → review
-  const steps = ["select", "declarant", "baggage", ...dynamicSteps, "review"];
+  // Если только ТС — пропускаем шаг baggage (разделы 2 и 3 не нужны)
+  const onlyVehicle = selected.length > 0 && selected.every(k => k === "vehicle");
+  const steps = onlyVehicle
+    ? ["select", "declarant", ...dynamicSteps, "review"]
+    : ["select", "declarant", "baggage", ...dynamicSteps, "review"];
   const currentStep = steps[stepIndex];
 
   const next = () => setStepIndex(i => Math.min(i + 1, steps.length - 1));
@@ -52,7 +55,7 @@ export default function App() {
   const progressSteps = [
     { key: "select",    label: "Что везёте" },
     { key: "declarant", label: "Декларант" },
-    { key: "baggage",   label: "Перемещение" },
+    ...(onlyVehicle ? [] : [{ key: "baggage", label: "Перемещение" }]),
     ...dynamicSteps.map(k => ({ key: k, label: TYPE_META[k]?.label || k })),
     { key: "review",    label: "Проверка" },
   ];
