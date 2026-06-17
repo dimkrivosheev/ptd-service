@@ -41,6 +41,10 @@ export default function StepDeclarant({ data, update, onNext }) {
             <CountryInput value={d.country_to || "Россия"} onChange={(v) => update({ country_to: v })} />
           </Field>
         </Row>
+
+        <Field label="Дата подачи декларации">
+          <Input type="date" value={d.sign_date || ""} onChange={(e) => update({ sign_date: e.target.value })} />
+        </Field>
       </Card>
 
       <NavButtons onNext={onNext} />
