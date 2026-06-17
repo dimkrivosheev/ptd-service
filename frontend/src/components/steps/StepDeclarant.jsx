@@ -51,7 +51,7 @@ export default function StepDeclarant({ data, update, onNext }) {
         <Field>
           <RadioGroup
             name="baggage_type" toggleable={true}
-            value={d.baggage_type || "accompanied"}
+            value={d.baggage_type || ""}
             onChange={(v) => update({ baggage_type: v })}
             options={[
               { value: "accompanied", label: "Сопровождаемый багаж (включая ручную кладь)" },
@@ -66,7 +66,7 @@ export default function StepDeclarant({ data, update, onNext }) {
         <Field>
           <RadioGroup
             name="direction" toggleable={true}
-            value={d.direction || "import"}
+            value={d.direction || ""}
             onChange={(v) => update({ direction: v })}
             options={[
               { value: "import",   label: "Ввоз (свободное обращение)" },
