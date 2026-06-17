@@ -1,80 +1,71 @@
 import { useState } from "react";
 import StepDeclarant from "./components/steps/StepDeclarant";
-import StepSelectTypes from "./components/steps/StepSelectTypes";
+import StepMovement from "./components/steps/StepMovement";
 import StepVehicle from "./components/steps/StepVehicle";
 import StepCash from "./components/steps/StepCash";
 import StepGoods from "./components/steps/StepGoods";
+import StepLgota from "./components/steps/StepLgota";
 import StepCultural from "./components/steps/StepCultural";
 import StepWeapons from "./components/steps/StepWeapons";
 import StepMeds from "./components/steps/StepMeds";
 import StepAnimals from "./components/steps/StepAnimals";
+import StepOther from "./components/steps/StepOther";
 import StepReview from "./components/steps/StepReview";
 import ProgressBar from "./components/ProgressBar";
 
-// Порядок динамических шагов по типу ПТД
 const TYPE_STEPS = {
-  vehicle:  { label: "Транспорт",         icon: "🚗", component: StepVehicle },
-  cash:     { label: "Деньги",            icon: "💵", component: StepCash },
-  goods:    { label: "Товары",            icon: "📦", component: StepGoods },
-  cultural: { label: "Культурные ценности", icon: "🖼", component: StepCultural },
-  weapons:  { label: "Оружие",            icon: "🔫", component: StepWeapons },
-  meds:     { label: "Лекарства",         icon: "💊", component: StepMeds },
-  animals:  { label: "Животные",          icon: "🐾", component: StepAnimals },
+  vehicle:  { label: "Транспорт",    component: StepVehicle },
+  cash:     { label: "Наличные",     component: StepCash },
+  льгота:   { label: "Льгота",       component: StepLgota },
+  goods:    { label: "Товары",       component: StepGoods },
+  cultural: { label: "Культ. ценности", component: StepCultural },
+  weapons:  { label: "Оружие",       component: StepWeapons },
+  meds:     { label: "Лекарства",    component: StepMeds },
+  animals:  { label: "Животные",     component: StepAnimals },
+  minerals: { label: "Прочее",       component: StepOther },
+  bio:      { label: null,           component: null }, // объединены в StepOther
+  other:    { label: null,           component: null },
 };
+
+// Порядок шагов для раздела 4
+const TYPE_ORDER = ["vehicle", "cash", "льгота", "goods", "cultural", "weapons", "meds", "animals", "minerals"];
 
 export default function App() {
   const [data, setData] = useState({});
-  const [selectedTypes, setSelectedTypes] = useState([]);
-  // steps: ['declarant', 'select', ...typeKeys, 'review']
   const [stepIndex, setStepIndex] = useState(0);
 
-  const steps = ["declarant", "select", ...selectedTypes, "review"];
-
   const update = (patch) => setData((d) => ({ ...d, ...patch }));
+
+  const selected = data.selected_types || [];
+
+  // Уникальные шаги — minerals/bio/other объединены
+  const hasOther = selected.some(k => ["minerals", "bio", "other"].includes(k));
+  const dynamicSteps = TYPE_ORDER.filter(k => {
+    if (k === "minerals") return hasOther;
+    return selected.includes(k);
+  });
+
+  const steps = ["declarant", "movement", ...dynamicSteps, "review"];
+  const currentStep = steps[stepIndex];
 
   const next = () => setStepIndex((i) => Math.min(i + 1, steps.length - 1));
   const prev = () => setStepIndex((i) => Math.max(i - 1, 0));
 
-  const handleSelectTypes = (types) => {
-    setSelectedTypes(types);
-    // После выбора типов пересчитываем шаги и идём вперёд
-    setStepIndex(2); // первый шаг после выбора
-  };
-
-  const currentStep = steps[stepIndex];
-
-  // Прогресс-бар: фиксированные + динамические
   const progressSteps = [
     { key: "declarant", label: "Декларант" },
-    { key: "select",    label: "Что везёте" },
-    ...selectedTypes.map((t) => ({ key: t, label: TYPE_STEPS[t]?.label || t })),
+    { key: "movement",  label: "Перемещение" },
+    ...dynamicSteps.map(k => ({ key: k, label: TYPE_STEPS[k]?.label || k })),
     { key: "review",    label: "Проверка" },
   ];
 
   const renderStep = () => {
-    if (currentStep === "declarant") {
-      return <StepDeclarant data={data} update={update} onNext={next} />;
-    }
-    if (currentStep === "select") {
-      return (
-        <StepSelectTypes
-          selected={selectedTypes}
-          onConfirm={(types) => {
-            setSelectedTypes(types);
-            setStepIndex(2);
-          }}
-          onPrev={prev}
-        />
-      );
-    }
-    if (currentStep === "review") {
-      return <StepReview data={data} selectedTypes={selectedTypes} onPrev={prev} onReset={() => { setData({}); setSelectedTypes([]); setStepIndex(0); }} />;
-    }
-    // Динамические шаги
-    const typeKey = currentStep;
-    const StepComp = TYPE_STEPS[typeKey]?.component;
-    if (!StepComp) return null;
-    return <StepComp data={data} update={update} onNext={next} onPrev={prev} />;
+    if (currentStep === "declarant") return <StepDeclarant data={data} update={update} onNext={next} />;
+    if (currentStep === "movement")  return <StepMovement  data={data} update={update} onNext={next} onPrev={prev} />;
+    if (currentStep === "review")    return <StepReview    data={data} selectedTypes={selected} onPrev={prev} onReset={() => { setData({}); setStepIndex(0); }} />;
+    if (currentStep === "minerals")  return <StepOther     data={data} update={update} onNext={next} onPrev={prev} />;
+    const Comp = TYPE_STEPS[currentStep]?.component;
+    if (!Comp) return null;
+    return <Comp data={data} update={update} onNext={next} onPrev={prev} />;
   };
 
   return (
@@ -88,9 +79,7 @@ export default function App() {
           <div className="hdr-sub">Пассажирская таможенная декларация · ЕАЭС</div>
         </div>
       </header>
-
       <ProgressBar steps={progressSteps} currentKey={currentStep} />
-
       <main>{renderStep()}</main>
     </div>
   );
