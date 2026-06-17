@@ -194,7 +194,7 @@ export default function StepReview({ data, selectedTypes, onPrev, onReset }) {
       <button className="dl-btn" onClick={handleDownload} disabled={loading}>
         {loading ? "⏳ Формируем..." : "⬇ Скачать PDF"}
       </button>
-      <button className="dl-btn" onClick={handlePrint} disabled={loading} style={{ background: "#444", marginTop: 8 }}>
+      <button className="dl-btn secondary" onClick={handlePrint} disabled={loading} style={{ background: "#444", marginTop: 8 }}>
         🖨 Распечатать
       </button>
 
