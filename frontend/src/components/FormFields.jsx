@@ -139,7 +139,10 @@ export function RadioGroup({ name, options, value, onChange, toggleable = false 
         <div
           key={opt.value}
           className={`radio-option ${value === opt.value ? "sel" : ""}`}
-          onClick={() => { if (toggleable && value === opt.value) { onChange(""); } else { onChange(opt.value); } }}
+          onClick={() => {
+            if (toggleable && value === opt.value) { onChange(""); }
+            else { onChange(opt.value); }
+          }}
         >
           <span className="radio-dot" />
           <span className="radio-label">{opt.label}</span>
