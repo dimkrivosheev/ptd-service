@@ -132,14 +132,14 @@ export function AddressInput({ value, onChange }) {
 }
 
 // Radio group (кастомный)
-export function RadioGroup({ name, options, value, onChange }) {
+export function RadioGroup({ name, options, value, onChange, toggleable = false }) {
   return (
     <div className="radio-group">
       {options.map((opt) => (
         <label
           key={opt.value}
           className={`radio-option ${value === opt.value ? "sel" : ""}`}
-          onClick={() => onChange(opt.value)}
+          onClick={() => toggleable && value === opt.value ? onChange("") : onChange(opt.value)}
         >
           <input type="radio" name={name} value={opt.value} checked={value === opt.value} onChange={() => {}} />
           <span className="radio-dot" />
