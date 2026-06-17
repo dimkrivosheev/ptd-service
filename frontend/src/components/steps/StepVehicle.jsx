@@ -38,7 +38,7 @@ export default function StepVehicle({ data, update, onNext, onPrev }) {
 
         <Row cols={2}>
           <Field label="Номер кузова"><Input value={d.body_num || ""} onChange={(e) => update({ body_num: e.target.value })} /></Field>
-          <Field label="Номер шасси"><Input placeholder="ОТСУТСТВУЕТ" value={d.chassis_num || ""} placeholder="ОТСУТСТВУЕТ (по умолчанию)" onChange={(e) => update({ chassis_num: e.target.value })} /></Field>
+          <Field label="Номер шасси"><Input placeholder="ОТСУТСТВУЕТ" value={d.chassis_num || ""} onChange={(e) => update({ chassis_num: e.target.value })} /></Field>
         </Row>
 
         <Field label="Дата изготовления">
