@@ -1,4 +1,4 @@
-import { Card, Field, Input, Select, Row, CountryInput, AddressInput, NavButtons } from "../FormFields";
+import { Card, Field, Input, Select, Row, CountryInput, AddressInput, NavButtons, RadioGroup } from "../FormFields";
 
 export default function StepDeclarant({ data, update, onNext }) {
   const d = data;
@@ -44,6 +44,37 @@ export default function StepDeclarant({ data, update, onNext }) {
 
         <Field label="Дата подачи декларации">
           <Input type="date" value={d.sign_date || ""} onChange={(e) => update({ sign_date: e.target.value })} />
+        </Field>
+      </Card>
+
+      <Card title="Раздел 2 — Способ перемещения" subtitle="Как перемещаются товары и транспортное средство">
+        <Field>
+          <RadioGroup
+            name="baggage_type"
+            value={d.baggage_type || "accompanied"}
+            onChange={(v) => update({ baggage_type: v })}
+            options={[
+              { value: "accompanied", label: "Сопровождаемый багаж (включая ручную кладь)" },
+              { value: "unaccompanied", label: "Несопровождаемый багаж" },
+              { value: "delivered", label: "Доставляемые товары без въезда лица" },
+            ]}
+          />
+        </Field>
+      </Card>
+
+      <Card title="Раздел 3 — Направление" subtitle="Цель перемещения товаров">
+        <Field>
+          <RadioGroup
+            name="direction"
+            value={d.direction || "import"}
+            onChange={(v) => update({ direction: v })}
+            options={[
+              { value: "import",   label: "Ввоз (свободное обращение)" },
+              { value: "export",   label: "Вывоз" },
+              { value: "temp_export", label: "Временный вывоз" },
+              { value: "transit",  label: "Транзит" },
+            ]}
+          />
         </Field>
       </Card>
 
